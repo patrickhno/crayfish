@@ -67,6 +67,27 @@ Which gives:
 
 ![](http://github.com/patrickhno/crayfish/raw/master/doc/example.png) 
 
+You could also use Prawn directly if you want to:
+
+``` Ruby
+<% table [
+  [
+    { :content => 'Permit', :background_color => color},
+    make_table([['                ', { :content => 'Time', :background_color => color}]])],
+  [{ :content => 'Cash',               :background_color => color},  ''],
+  [{ :content => 'Organizer',          :background_color => color}, 'Crayfish'],
+  [ { :content => make_table([
+    [
+      { :content => 'Location',  :background_color => color}, location[:name],
+      { :content => 'Zip Code',  :background_color => color}, location[:zip_code],
+      { :content => 'City',      :background_color => color}, location[:city]]
+    ]), :colspan => 2
+    }
+  ]
+], :width => 540
+%>
+```
+
 ## License
 
 (The MIT License)
