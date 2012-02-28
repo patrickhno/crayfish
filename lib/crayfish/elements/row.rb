@@ -47,7 +47,7 @@ class CrayRow < CrayContainer
     value = ''
     if args.first.kind_of? Symbol
       raise "you must use row_for(model) to reference with symbols" unless @model
-      label = args.first.to_s
+      label = I18n.t args.first, :scope => [:activerecord, :attributes, @model.class.name.underscore.to_sym], :default => args.first.to_s.titleize
       value = @model.respond_to?(args.first) ? @model.send(args.first) : @model[args.first]
     else
       label = args.first[:label]
