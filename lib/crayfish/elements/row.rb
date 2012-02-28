@@ -22,10 +22,11 @@
 
 class CrayRow < CrayContainer
 
-  def initialize fish,pdf,table
+  def initialize fish,pdf,table,model=nil
     @table = table
     @color = 'CCCCFF'
     @spans = []
+    @model = model
     super fish,pdf
   end
 
@@ -45,8 +46,9 @@ class CrayRow < CrayContainer
     label = ''
     value = ''
     if args.first.kind_of? Symbol
+      raise "you must use row_for(model) to reference with symbols" unless @model
       label = args.first.to_s
-      value = ''
+      value = @model.respond_to?(args.first) ? @model.send(args.first) : @model[args.first]
     else
       label = args.first[:label]
       value = args.first[:value]

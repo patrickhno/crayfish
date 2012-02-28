@@ -43,7 +43,6 @@ class CrayTable < CrayContainer
   end
 
   def draw text
-puts "calling <#{pdf.class.name}:0x#{pdf.object_id.to_s(16)}>.table"
     pdf.table raw, :width => 540
   end
 

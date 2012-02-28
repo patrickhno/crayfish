@@ -47,9 +47,9 @@ module Crayfish
           eval(erb.src)
         rescue => e
           no = 0
-          Rails.logger.debug erb.src.split("\n").map{ |line| no+=1; "#{no}: #{line}" }.join("\n")
-          Rails.logger.debug e.message
-          Rails.logger.debug e.backtrace.join("\n")
+          ::Rails.logger.debug erb.src.split("\n").map{ |line| no+=1; "#{no}: #{line}" }.join("\n")
+          ::Rails.logger.debug e.message
+          ::Rails.logger.debug e.backtrace.join("\n")
         end
         @pdf.render if @branch_level == 0
       end

@@ -2,11 +2,11 @@
 
 PDF templating for Rails.
 
-Example:
+Example (say app/views/main/show.pdf.crayfish):
 
 ``` ruby
 <%
-@location => { :name => 'GitHub', :zip_code => '0000', :city => 'Internet' }
+@location = { :name => 'GitHub', :zip_code => '0000', :city => 'Internet' }
 
 form %Q{
   Apples %c{    }x%c{    } boxes                                | =%c{         }
@@ -14,11 +14,12 @@ form %Q{
 }, :title => 'Sold                                                 in kjosk %c{      }'
 
 move_down 6
+%>
 
 <% form do |f| %>
-  <% f.heading 'Sold                                                 in kjosk '+f.field('      ') %>
-  Apples   <%= f.field('    ') %>x<%= f.field('    ') %> boxes                <%= f.span %> =<%= f.field('         ') %>
-  Pears <%= f.field('       ') %>+ bananas<%= f.field('       ') %>                         <%= f.span %> =<%= f.field('         ') %>
+  <% f.heading 'Sold          in kjosk '+f.field('      ') %>
+  Apples   <%= f.field('    ') %>x<%= f.field('    ') %> boxes      <%= f.span %> =<%= f.field('         ') %>
+  Pears <%= f.field('       ') %>+ bananas<%= f.field('       ') %> <%= f.span %> =<%= f.field('         ') %>
 <% end -%>
 
 <% table do |f| %>
@@ -54,7 +55,7 @@ move_down 6
   <% f.row do |r| %>
     <% r.label 'Organizer';          r.span; r.text 'Crayfish' %>
   <% end -%>
-  <% f.row_for @location.addresses.first do |r| %>
+  <% f.row_for @location do |r| %>
     <% r.field :label => 'Location' , :value => @location[:name] %>
     <% r.field :zip_code %>
     <% r.field :city %>
@@ -62,11 +63,15 @@ move_down 6
 <% end -%>
 ```
 
+Which gives:
+
+![](http://github.com/patrickhno/crayfish/raw/master/doc/example.png) 
+
 ## License
 
 (The MIT License)
 
-Copyright (c) 2012 Bingoentrepenøren AS
+Copyright (c) 2012 Bingoentrepenøren AS  
 Copyright (c) 2012 Patrick Hanevold
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ‘Software’), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:

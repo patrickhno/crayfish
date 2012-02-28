@@ -54,7 +54,7 @@ class CrayContainer
 
   def row_for *args, &block
     raise "row_for must have block" unless block_given?
-    row = CrayRow.new(@fish,pdf,self)
+    row = CrayRow.new(@fish,pdf,self,args.first)
     block.call row
     row.draw ''
   end
