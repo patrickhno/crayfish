@@ -26,9 +26,13 @@ module Crayfish
   module ActionView
 
     def render *args
-      @branch_level += 1
-      super
-      @branch_level -= 1
+      if @branch_level
+        @branch_level += 1
+        super
+        @branch_level -= 1
+      else
+        super
+      end
     end
 
     private
