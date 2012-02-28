@@ -15,3 +15,5 @@ gem "jquery-rails"
 
 # To use debugger
 # gem 'ruby-debug19', :require => 'ruby-debug'
+
+gem 'prawn', :git => 'git://github.com/teknobingo/prawn.git', :branch => 'master'

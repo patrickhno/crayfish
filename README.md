@@ -2,7 +2,20 @@
 
 PDF templating for Rails.
 
-Example (say app/views/main/show.pdf.crayfish):
+## Installation
+
+``` ruby
+gem install linguify
+```
+
+Prawn havent been gemified for a while, so you need our latest snapshot.  
+Add this to your Gemfile:
+
+``` Ruby
+gem 'prawn', :git => 'git://github.com/teknobingo/prawn.git', :branch => 'master'
+```
+
+## Example (say app/views/main/show.pdf.crayfish):
 
 ``` ruby
 <%

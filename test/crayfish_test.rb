@@ -104,12 +104,13 @@ class CrayfishTest < ActiveSupport::TestCase
         ], [
           {:content => 'Label5',   :background_color => 'CCCCFF'},
           {:content => 'Hello',    :background_color => 'ffffff'},
-          {:content => 'zip_code', :background_color => 'CCCCFF'},
-          {:content => '',         :background_color => 'ffffff'},
-          {:content => 'city',     :background_color => 'CCCCFF'},
-          {:content => '',         :background_color => 'ffffff'}
+          {:content => 'Zip Code', :background_color => 'CCCCFF'},
+          {:content => '0000',     :background_color => 'ffffff'},
+          {:content => 'City',     :background_color => 'CCCCFF'},
+          {:content => 'Internet', :background_color => 'ffffff'}
         ]
-      ], {:width => 540})
+      ], {:width => 540}
+    )
 
     location = { :name => 'Hello', :zip_code => '0000', :city => 'Internet'}
     @view.send(:table) do |t| 
@@ -131,12 +132,12 @@ class CrayfishTest < ActiveSupport::TestCase
     end
   end
 
-  # Prawn barfs no matter what!! How to widen the max width?
-  #test "basic_form" do
-  #  @view.send(:form,%Q{
-  #    Aplles %c{    }x%c{    } boxes                | =%c{         }
-  #    Pears %c{       }+ bananas%c{       }         | =%c{         }
-  #  }, :title => 'Fruits %c{      }')
-  #end
+  test "basic_form" do
+    @view.send(:form,%Q{
+      Aplles %c{    }x%c{    } boxes                | =%c{         }
+      Pears %c{       }+ bananas%c{       }         | =%c{         }
+    }, :title => 'Fruits %c{      }')
+    # TODO: exceptations
+  end
 
 end
