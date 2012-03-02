@@ -153,13 +153,27 @@ class CrayfishTest < ActiveSupport::TestCase
   end
 
   def table_contents table
-    table.rows(0..3).columns(0..-1).map{ |cell|
+    table.rows(0..-1).map{ |cell|
       if cell.kind_of?(Prawn::Table::Cell::Text)
-        cell.content
-      elsif cell.kind_of?(Crayfish::CellHelper)
         cell.content
       elsif cell.kind_of?(Prawn::Table::Cell::Subtable)
         table_contents(cell.subtable)
+      elsif cell.kind_of?(Crayfish::CellHelper)
+        cell.content
+      else
+        cell.class.name
+      end
+    }
+  end
+
+  def cell_positions table
+    table.rows(0..-1).map{ |cell|
+      if cell.kind_of?(Prawn::Table::Cell::Text)
+        cell.x
+      elsif cell.kind_of?(Prawn::Table::Cell::Subtable)
+        cell_positions(cell.subtable)
+      elsif cell.kind_of?(Crayfish::CellHelper)
+        cell.x
       else
         cell.class.name
       end
@@ -173,7 +187,7 @@ class CrayfishTest < ActiveSupport::TestCase
       Pears %c{       }+ bananas%c{       }         | =%c{         }
     }
 
-    pdf   = Prawn::Document.new() #mock('Prawn::Document')
+    pdf   = Prawn::Document.new()
 
     view  = mock('Crayfish::ActionView')
     view.expects(:flush).at_least_once
@@ -200,6 +214,13 @@ class CrayfishTest < ActiveSupport::TestCase
         [" =", ""],
         ["Pears ", "", "+ bananas", "", "         ", ""],
         [" =", ""]]]
+
+    # check span alignment
+    n=0
+    aligned_cells = cell_positions(table).last.select{ |item| n+=1; item if n.even? }.map{ |row| row.last }
+
+    assert_equal 2,aligned_cells.size
+    assert_equal 1,aligned_cells.uniq.size
 
   end
 
