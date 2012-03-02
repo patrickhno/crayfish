@@ -22,10 +22,9 @@
 
 module Crayfish
   module Rails
-    class Base < ::ActionView::TemplateHandler
-      include ::ActionView::TemplateHandlers::Compilable
+    class Base
 
-      def compile(template)
+      def self.call template
         "setup;" +
         "paint \"#{template.source}\""
       end
