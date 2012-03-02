@@ -5,7 +5,7 @@ PDF templating for Rails.
 ## Installation
 
 ``` ruby
-gem install linguify
+gem install crayfish
 ```
 
 Prawn havent been gemified for a while, so you need our latest snapshot.  
