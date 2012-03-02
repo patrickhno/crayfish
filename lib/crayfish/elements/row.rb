@@ -20,50 +20,51 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-class CrayRow < CrayContainer
+module Crayfish
+  class CrayRow < CrayContainer
 
-  def initialize fish,pdf,table,model=nil
-    @table = table
-    @color = 'CCCCFF'
-    @spans = []
-    @model = model
-    super fish,pdf
-  end
-
-  def label label
-    append :content => label, :background_color => @color
-  end
-
-  def text text
-    append :content => text, :background_color => 'ffffff'
-  end
-
-  def span
-    @spans << @raw.size
-  end
-
-  def field *args
-    label = ''
-    value = ''
-    if args.first.kind_of? Symbol
-      raise "you must use row_for(model) to reference with symbols" unless @model
-      label = I18n.t args.first, :scope => [:activerecord, :attributes, @model.class.name.underscore.to_sym], :default => args.first.to_s.titleize
-      value = @model.respond_to?(args.first) ? @model.send(args.first) : @model[args.first]
-    else
-      label = args.first[:label]
-      value = args.first[:value]
+    def initialize fish,pdf,table,model=nil
+      @table = table
+      @color = 'CCCCFF'
+      @spans = []
+      @model = model
+      super fish,pdf
     end
-    self.label label
-    text value
-  end
 
-  def draw text
-    if @table.kind_of? CrayForm
-      @table.append [ { :content => @table.pdf.make_table([raw], :width => 540) } ], :spans => @spans
-    else
-      @table.append raw
+    def label label
+      append :content => label, :background_color => @color
     end
-  end
 
+    def text text
+      append :content => text, :background_color => 'ffffff'
+    end
+
+    def span
+      @spans << @raw.size
+    end
+
+    def field *args
+      label = ''
+      value = ''
+      if args.first.kind_of? Symbol
+        raise "you must use row_for(model) to reference with symbols" unless @model
+        label = I18n.t args.first, :scope => [:activerecord, :attributes, @model.class.name.underscore.to_sym], :default => args.first.to_s.titleize
+        value = @model.respond_to?(args.first) ? @model.send(args.first) : @model[args.first]
+      else
+        label = args.first[:label]
+        value = args.first[:value]
+      end
+      self.label label
+      text value
+    end
+
+    def draw text
+      if @table.kind_of? CrayForm
+        @table.append [ { :content => @table.pdf.make_table([raw], :width => 540) } ], :spans => @spans
+      else
+        @table.append raw
+      end
+    end
+
+  end
 end
-

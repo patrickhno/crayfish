@@ -20,44 +20,45 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-class CrayContainer
+module Crayfish
+  class CrayContainer
 
-  attr_accessor :raw
-  attr_reader :options,:tokens,:pdf
+    attr_accessor :raw
+    attr_reader :options,:tokens,:pdf
 
-  def initialize fish, pdf, options = {}
-    @fish    = fish
-    @pdf     = pdf
-    @raw     = []
-    @options = options
-    @tokens = { :span => options[:span] || /%\|/, :element => options[:element] || /%c{[^}]*}/ }
+    def initialize fish, pdf, options = {}
+      @fish    = fish
+      @pdf     = pdf
+      @raw     = []
+      @options = options
+      @tokens = { :span => options[:span] || /%\|/, :element => options[:element] || /%c{[^}]*}/ }
+    end
+
+    def append stuff, options={}
+      @raw << stuff
+    end
+
+    def field str
+      "%c{#{str}}"
+    end
+
+    def span
+      '%|'
+    end
+
+    def row *args, &block
+      raise "row must have block" unless block_given?
+      row = CrayRow.new(@fish,pdf,self)
+      block.call row
+      row.draw ''
+    end
+
+    def row_for *args, &block
+      raise "row_for must have block" unless block_given?
+      row = CrayRow.new(@fish,pdf,self,args.first)
+      block.call row
+      row.draw ''
+    end
+
   end
-
-  def append stuff, options={}
-    @raw << stuff
-  end
-
-  def field str
-    "%c{#{str}}"
-  end
-
-  def span
-    '%|'
-  end
-
-  def row *args, &block
-    raise "row must have block" unless block_given?
-    row = CrayRow.new(@fish,pdf,self)
-    block.call row
-    row.draw ''
-  end
-
-  def row_for *args, &block
-    raise "row_for must have block" unless block_given?
-    row = CrayRow.new(@fish,pdf,self,args.first)
-    block.call row
-    row.draw ''
-  end
-
 end
-

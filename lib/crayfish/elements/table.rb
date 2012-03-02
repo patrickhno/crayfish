@@ -20,31 +20,32 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-class CrayTable < CrayContainer
+module Crayfish
+  class CrayTable < CrayContainer
 
-  attr_reader :pdf
+    attr_reader :pdf
 
-  def initialize fish,pdf
-    @color = 'CCCCFF'
-    super
-  end
-
-  def field *args
-    label = ''
-    value = ''
-    if args.first.kind_of? Symbol
-      label = args.first.to_s
-      value = ''
-    else
-      label = args.first[:label]
-      value = args.first[:value]
+    def initialize fish,pdf
+      @color = 'CCCCFF'
+      super
     end
-    append [{ :content => label,   :background_color => @color},  value]
-  end
 
-  def draw text
-    pdf.table raw, :width => 540
-  end
+    def field *args
+      label = ''
+      value = ''
+      if args.first.kind_of? Symbol
+        label = args.first.to_s
+        value = ''
+      else
+        label = args.first[:label]
+        value = args.first[:value]
+      end
+      append [{ :content => label,   :background_color => @color},  value]
+    end
 
+    def draw text
+      pdf.table raw, :width => 540
+    end
+
+  end
 end
-
