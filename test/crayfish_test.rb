@@ -152,6 +152,20 @@ class CrayfishTest < ActiveSupport::TestCase
     @view.send(:form,text, :title => 'Fruits %c{      }')
   end
 
+  def table_contents table
+    table.rows(0..3).columns(0..-1).map{ |cell|
+      if cell.kind_of?(Prawn::Table::Cell::Text)
+        cell.content
+      elsif cell.kind_of?(Crayfish::CellHelper)
+        cell.content
+      elsif cell.kind_of?(Prawn::Table::Cell::Subtable)
+        table_contents(cell.subtable)
+      else
+        cell.class.name
+      end
+    }
+  end
+
   test "CrayForm's form_body" do
 
     text = %Q{
@@ -159,104 +173,33 @@ class CrayfishTest < ActiveSupport::TestCase
       Pears %c{       }+ bananas%c{       }         | =%c{         }
     }
 
-    pdf   = mock('Prawn::Document')
-    font  = mock('Prawn::Font')
-    table = mock('Prawn::Table')
-    pdf.expects(:cursor).at_least_once.returns(0)
-
-    pdf.expects(:make_table).once.with do |table,options|
-      table.kind_of?(Array) &&
-      options == {:width => 540, :cell_style => {:padding => [0, 0, 0, 0], :border_width => 1}}
-    end.returns(table)
-
-    pdf.expects(:make_table).with do |tab,options|
-      tab.kind_of?(Array) && tab.size == 2 &&
-      tab[0].size == 2 &&
-      tab[1].size == 2 &&
-      tab[0][0] == table &&
-      tab[0][1] == table &&
-      tab[1][0] == table &&
-      tab[1][1] == table &&
-      options == {:width => 540, :cell_style => {:padding => [11, 0, 11, 0], :borders => []}}
-    end.returns(table)
-
-    pdf.expects(:make_table).with do |table,options|
-      table.kind_of?(Array) && table.size == 1 &&
-      table.first.size == 2 &&
-      table.first.select{ |cell| cell.kind_of?(Crayfish::CellHelper) }.size == 2 &&
-      table.first[0].content == 'Fruits ' &&
-      table.first[1].content == ''        &&
-      options == {:cell_style => {:borders => []}}
-    end.returns(table)
-
-    pdf.expects(:make_table).with do |table,options|
-      table.kind_of?(Array) && table.size == 1 &&
-      table.first.size == 6 &&
-      table.first.select{ |cell| cell.kind_of?(Crayfish::CellHelper) }.size == 6 &&
-      table.first[0].content == 'Apples '                  &&
-      table.first[1].content == ''                         &&
-      table.first[2].content == 'x'                        &&
-      table.first[3].content == ''                         &&
-      table.first[4].content == ' boxes                '   &&
-      table.first[5].content == ''                         &&
-      options == {:cell_style => {:borders => []}}
-    end.returns(table)
-
-    pdf.expects(:make_table).with do |table,options|
-      table.kind_of?(Array) && table.size == 1 &&
-      table.first.size == 6 &&
-      table.first.select{ |cell| cell.kind_of?(Crayfish::CellHelper) }.size == 6 &&
-      table.first[0].content == 'Pears '      &&
-      table.first[1].content == ''            &&
-      table.first[2].content == '+ bananas'   &&
-      table.first[3].content == ''            &&
-      table.first[4].content == '         '   &&
-      table.first[5].content == ''            &&
-      options == {:cell_style => {:borders => []}}
-    end.returns(table)
-
-    pdf.expects(:make_table).with do |table,options|
-      table.kind_of?(Array) && table.size == 1 &&
-      table.first.size == 2 &&
-      table.first.select{ |cell| cell.kind_of?(Crayfish::CellHelper) }.size == 2 &&
-      table.first[0].content == ' =' &&
-      table.first[1].content == ''   &&
-      options == {:cell_style => {:borders => []}}
-    end.returns(table)
-
-    pdf.expects(:make_table).with do |tab,options|
-      tab.kind_of?(Array) && tab.size == 1 &&
-      tab.first.size == 1 &&
-      tab.first[0] == table &&
-      options == {:width => 540, :cell_style => {:padding => [0, 0, 0, 0], :borders => []}}
-    end.returns(table)
-
-    pdf.expects(:make_table).with do |table,options|
-      table.kind_of?(Array) && table.size == 1 &&
-      table.first.size == 2 &&
-      table.first.select{ |cell| cell.kind_of?(Crayfish::CellHelper) }.size == 2 &&
-      table.first[0].content == ' =' &&
-      table.first[1].content == ''   &&
-      options == {:cell_style => {:borders => []}}
-    end.returns(table)
-
-    pdf.expects(:font).at_least_once.returns(font)
-    pdf.expects(:fill_color).with('CCCCFF')
-    pdf.expects(:fill)
-    pdf.expects(:fill_color).with('000000')
+    pdf   = Prawn::Document.new() #mock('Prawn::Document')
 
     view  = mock('Crayfish::ActionView')
     view.expects(:flush).at_least_once
 
-    font.expects(:line_gap).returns(5)
-    font.expects(:descender).returns(6)
-
-    table.expects(:draw)
-
     form = Crayfish::CrayForm.new(view,pdf,:title => 'Fruits %c{      }', :span => /\|/, :element => /%c{[^}]*}/)
     form.heading 'Fruits %c{      }'
     form.send(:form_body,text, :title => 'Fruits %c{      }')
-    form.draw ''
+    table = form.draw ''
+
+    assert_equal 3,table.row_length
+    assert_equal 1,table.column_length
+
+    assert_equal 1,table.row(0).size
+    assert_equal 1,table.row(1).size
+    assert_equal 1,table.row(2).size
+
+    assert_equal 1,table.row(0).first.subtable.row_length
+    assert_equal 1,table.row(0).first.subtable.column_length
+
+    assert_equal table_contents(table),
+      [[["Fruits ", ""]],
+       "",
+       [["Apples ", "", "x", "", " boxes                ", ""],
+        [" =", ""],
+        ["Pears ", "", "+ bananas", "", "         ", ""],
+        [" =", ""]]]
 
   end
 

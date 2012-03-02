@@ -48,13 +48,14 @@ module Crayfish
 
       allign_spans
 
-      table = @pdf.make_table raw, :width => 540, :cell_style => { :padding => [0,0,0,0], :border_width => 1 }
+      table = pdf.make_table raw, :width => 540, :cell_style => { :padding => [0,0,0,0], :border_width => 1 }
 
       pdf.fill_color 'CCCCFF'
       pdf.fill { @pdf.rectangle [0, pdf.cursor], table.width, table.height }
 
       pdf.fill_color '000000'
       table.draw
+      table
     end
 
   private
