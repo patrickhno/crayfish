@@ -122,6 +122,22 @@ module Crayfish
       cell.width(width) if width
     end
 
+    def tokenize str
+      pos = 0
+      tokenized = str.scan(tokens[:element]).map do |element|
+        part = str[pos..-1].partition(element)
+        pos += part.first.size
+        pos += element.size
+        if part.first.size > 0
+          [part.first,element]
+        else
+          element
+        end
+      end.flatten
+      tokenized << str[pos..-1] unless pos==str.size
+      tokenized
+    end
+
     def form_body form,options = {}
       color = 'CCCCFF'
 
@@ -139,7 +155,7 @@ module Crayfish
       # split text from fields in all spans
       table = span_table.map do |row|
         row.map do |span|
-          span.split(tokens[:element]).zip(span.scan(tokens[:element])).flatten
+          tokenize span
         end
       end
 
