@@ -111,8 +111,8 @@ module Crayfish
       Crayfish::CellHelper.new(Prawn::Table::Cell.make(pdf, text), options)
     end
 
-    def _field width=nil
-      cell = _text('', { :type => :field })
+    def _field str,width=nil
+      cell = _text(str, { :type => :field })
       cell.width(width) if width
       cell
     end
@@ -124,7 +124,8 @@ module Crayfish
 
     def tokenize str
       pos = 0
-      tokenized = str.scan(tokens[:element]).map do |element|
+#      tokenized = str.scan(tokens[:element]).map do |element|
+      tokenized = str.scan(/%c{[^}]*}/).map do |element|
         part = str[pos..-1].partition(element)
         pos += part.first.size
         pos += element.size
@@ -162,7 +163,13 @@ module Crayfish
       # translate each span into a subtable
       table.map! do |row|
         row.map do |span|
-          pdf.make_table [ span.map{ |cell| cell =~ /^#{tokens[:element].source}$/ ? _field(cell.count(' ')*space_width) : _text(cell) } ],:cell_style => { :borders => [] }
+          pdf.make_table [ span.map{ |cell|
+            if match = /^#{tokens[:element].source}$/.match(cell)
+              _field(match[:content],cell.count(' ')*space_width)
+            else
+              _text(cell)
+            end
+          } ],:cell_style => { :borders => [] }
         end
       end
 

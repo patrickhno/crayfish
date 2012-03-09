@@ -38,6 +38,7 @@ require 'crayfish/elements/cell_helper.rb'
 require 'crayfish/elements/row.rb'
 require 'crayfish/elements/table.rb'
 require 'crayfish/elements/form.rb'
+require 'crayfish/elements/html.rb'
 
 class ActionController::Base
   include Crayfish::ActionController

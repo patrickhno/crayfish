@@ -48,7 +48,7 @@ module Crayfish
       def paint template
         begin
           erb = Erubis::Eruby.new(template,:bufvar=>'@_out_buf')
-          eval(erb.src)
+          erb.evaluate(self)
         rescue => e
           no = 0
           ::Rails.logger.debug erb.src.split("\n").map{ |line| no+=1; "#{no}: #{line}" }.join("\n")
@@ -84,7 +84,7 @@ module Crayfish
           form    = args[0] || ''
           options = args[1] || {}
 
-          pdf = CrayForm.new(self,@pdf,options.merge(:span => /\|/, :element => /%c{[^}]*}/))
+          pdf = CrayForm.new(self,@pdf,options.merge(:span => /\|/, :element => /%c{(?<content>[^}]*)}/))
           pdf.heading options[:title] if options[:title]
           pdf.send(:form_body,form,options)
           pdf.draw @_out_buf
@@ -103,6 +103,15 @@ module Crayfish
           flush
           @pdf.table *args
         end
+      end
+
+      def html *args, &block
+        raise "hell" unless block_given?
+        flush
+        html = CrayHtml.new(self,@pdf)
+        block.call html
+        html.draw @_out_buf
+        flush false
       end
 
   end

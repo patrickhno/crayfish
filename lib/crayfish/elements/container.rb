@@ -31,7 +31,7 @@ module Crayfish
       @pdf     = pdf
       @raw     = []
       @options = options
-      @tokens = { :span => options[:span] || /%\|/, :element => options[:element] || /%c{[^}]*}/ }
+      @tokens = { :span => options[:span] || /%\|/, :element => options[:element] || /%c{(?<content>[^}]*)}/ }
     end
 
     def append stuff, options={}
