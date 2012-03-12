@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Bingoentrepenøren AS
+# Copyright (c) 2012 Bingoentreprenøren AS
 # Copyright (c) 2012 Patrick Hanevold
 #
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -21,12 +21,13 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module Crayfish
-  class CrayTable < CrayContainer
+  class CrayTable < CrayHtml #CrayContainer
 
     attr_reader :pdf
 
     def initialize fish,pdf
       @color = 'CCCCFF'
+      @text = ''
       super
     end
 
@@ -40,11 +41,11 @@ module Crayfish
         label = args.first[:label]
         value = args.first[:value]
       end
-      append [{ :content => label,   :background_color => @color},  value]
+      @text += "<tr><td style=\"background-color:##{@color}\">#{label}</td><td>#{value}</td></tr>"
     end
 
     def draw text
-      pdf.table raw, :width => 540
+      super "<table width=\"100%\">#{@text}</table>"
     end
 
   end

@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Bingoentrepenøren AS
+# Copyright (c) 2012 Bingoentreprenøren AS
 # Copyright (c) 2012 Patrick Hanevold
 #
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -28,7 +28,10 @@ module Crayfish
     def render *args
       if @branch_level
         @branch_level += 1
+        stack = @output_buffer
+        @output_buffer = ::ActionView::OutputBuffer.new
         super
+        @output_buffer = stack
         @branch_level -= 1
       else
         super
@@ -45,23 +48,27 @@ module Crayfish
         end
       end
 
-      def paint template
+      def output_buffer
+        @output_buffer ||= ::ActionView::OutputBuffer.new
+      end
+
+      def paint template,raw=false
         begin
-          erb = Erubis::Eruby.new(template,:bufvar=>'@_out_buf')
-          erb.evaluate(self)
+          html = raw ? template : eval(template)
+          CrayHtml.new(self,@pdf).draw(html)
         rescue => e
-          no = 0
-          ::Rails.logger.debug erb.src.split("\n").map{ |line| no+=1; "#{no}: #{line}" }.join("\n")
-          ::Rails.logger.debug e.message
-          ::Rails.logger.debug e.backtrace.join("\n")
+           no = 0
+           ::Rails.logger.debug template.split("\n").map{ |line| no+=1; "#{no}: #{line}" }.join("\n")
+           ::Rails.logger.debug e.message
+           ::Rails.logger.debug e.backtrace.join("\n")
         end
-        @pdf.render if @branch_level == 0
+        @pdf.render if @branch_level == 0 and !raw
       end
 
       def flush paint=true
-        buf = @_out_buf || ''
-        @pdf.text buf if paint
-        @_out_buf = ''
+        buf = @output_buffer.to_s || ''
+        paint(buf,true) if paint
+        @output_buffer = ::ActionView::OutputBuffer.new
         buf
       end
 
@@ -72,46 +79,6 @@ module Crayfish
         else
           super
         end
-      end
-
-      def form *args, &block
-        flush
-        if block_given?
-          pdf = CrayForm.new(self,@pdf)
-          block.call pdf
-          pdf.draw @_out_buf
-        else
-          form    = args[0] || ''
-          options = args[1] || {}
-
-          pdf = CrayForm.new(self,@pdf,options.merge(:span => /\|/, :element => /%c{(?<content>[^}]*)}/))
-          pdf.heading options[:title] if options[:title]
-          pdf.send(:form_body,form,options)
-          pdf.draw @_out_buf
-        end
-        @_out_buf = ''
-      end
-
-      def table *args, &block
-        if block_given?
-          flush
-
-          pdf = CrayTable.new(self,@pdf)
-          block.call pdf
-          pdf.draw @_out_buf
-        else
-          flush
-          @pdf.table *args
-        end
-      end
-
-      def html *args, &block
-        raise "hell" unless block_given?
-        flush
-        html = CrayHtml.new(self,@pdf)
-        block.call html
-        html.draw @_out_buf
-        flush false
       end
 
   end

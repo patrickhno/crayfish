@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Bingoentrepenøren AS
+# Copyright (c) 2012 Bingoentreprenøren AS
 # Copyright (c) 2012 Patrick Hanevold
 #
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -26,7 +26,9 @@ module Crayfish
 
       def self.call template
         "setup;" +
-        "paint \"#{template.source}\""
+        "paint <<__this_is_quite_unique__\n" + 
+        ::ActionView::Template::Handlers::ERB.call(template) +
+        "\n__this_is_quite_unique__\n"
       end
 
     end

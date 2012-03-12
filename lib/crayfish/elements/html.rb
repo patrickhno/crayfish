@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Bingoentrepenøren AS
+# Copyright (c) 2012 Bingoentreprenøren AS
 # Copyright (c) 2012 Patrick Hanevold
 #
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -64,11 +64,19 @@ module Crayfish
           postfix = "[#{counters[node.name.to_sym]}]"
           counters[node.name.to_sym] += 1
         end
-        traverse node, "#{path}/#{node.name}#{postfix}", '', params
+        compile node, "#{path}/#{node.name}#{postfix}", '', params
       end
     end
 
-    def traverse node, path = "/#{node.name}", postfix='',scope={ :table => nil, :tr => nil }
+    def style cell,node,scope
+      cell[:colspan] = node.attributes['colspan'].value.to_i if node.attributes['colspan']
+      cell[:rowspan] = node.attributes['rowspan'].value.to_i if node.attributes['rowspan']
+      cell[:valign]  = :center if cell[:rowspan]
+      cell[:align]   = node.attributes['align'].value.to_sym if node.attributes['align']
+      scope[:table_styles] << { :row => scope[:table].size, :col => scope[:tr].size, :style => node.attributes['style'].value } if node.attributes['style']
+    end
+
+    def compile node, path = "/#{node.name}", postfix='',scope={ :table => nil, :tr => nil }
       name = node.name.to_sym
 
       case name
@@ -103,11 +111,7 @@ module Crayfish
         if cells.size <= 1
           cells << "" if cells.size == 0
           cell = { :content => cells.first.kind_of?(String) ? cells.first.strip : cells.first }
-          cell[:colspan] = node.attributes['colspan'].value.to_i if node.attributes['colspan']
-          cell[:rowspan] = node.attributes['rowspan'].value.to_i if node.attributes['rowspan']
-          cell[:valign]  = :center if cell[:rowspan]
-          cell[:align]   = node.attributes['align'].value.to_sym if node.attributes['align']
-          scope[:table_styles] << { :row => scope[:table].size, :col => scope[:tr].size, :style => node.attributes['style'].value } if node.attributes['style']
+          style cell,node,scope
           scope[:tr] << cell
         else
           scope[:tr] << cells
@@ -120,11 +124,7 @@ module Crayfish
         if cells.size <= 1
           cells << "" if cells.size == 0
           cell = { :content => "<b>#{cells.first.strip}</b>", :align => :center }
-          cell[:colspan] = node.attributes['colspan'].value.to_i if node.attributes['colspan']
-          cell[:rowspan] = node.attributes['rowspan'].value.to_i if node.attributes['rowspan']
-          cell[:valign]  = :center if cell[:rowspan]
-          cell[:align]   = node.attributes['align'].value.to_sym if node.attributes['align']
-          scope[:table_styles] << { :row => scope[:table].size, :col => scope[:tr].size, :style => node.attributes['style'].value } if node.attributes['style']
+          style cell,node,scope
           scope[:tr] << cell
         else
           scope[:tr] << cells
@@ -206,13 +206,13 @@ module Crayfish
 
     def draw text
       doc = Nokogiri::HTML(text)
-      prawn = doc.children.map do |node|
-        traverse node
-      end.flatten.first
 
-      post_resize prawn,540
-
-      prawn.draw
+      doc.children.map do |element|
+        compile element
+      end.flatten.each do |prawn|
+        post_resize prawn,540
+        prawn.draw
+      end
     end
 
   end

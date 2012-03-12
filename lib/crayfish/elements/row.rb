@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Bingoentrepenøren AS
+# Copyright (c) 2012 Bingoentreprenøren AS
 # Copyright (c) 2012 Patrick Hanevold
 #
 # Permission is hereby granted, free of charge, to any person obtaining
