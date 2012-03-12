@@ -22,7 +22,7 @@ gem 'prawn', :git => 'git://github.com/teknobingo/prawn.git', :branch => 'master
 
 ## Example (say app/views/main/show.pdf.crayfish):
 
-``` ruby
+``` html
 <table>
  <tr>
   <th colspan = "6" align = "center" style="background-color:#aaffaa">Time Table</th>
