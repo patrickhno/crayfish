@@ -1,6 +1,11 @@
 # Crayfish
 
 PDF templating for Rails.
+Crayfish basically translates HTML to PDF.
+The idea is that you can use your existing view helpers in your PDF's.
+The HTML support is quite limited at the moment.
+
+You can also use the prawn API in your templates.
 
 ## Installation
 
@@ -19,68 +24,56 @@ gem 'prawn', :git => 'git://github.com/teknobingo/prawn.git', :branch => 'master
 
 ``` ruby
 <%
-@location = { :name => 'GitHub', :zip_code => '0000', :city => 'Internet' }
-
-form %Q{
-  Apples %c{    }x%c{    } boxes                                | =%c{         }
-  Pears %c{       }+ bananas%c{       }                         | =%c{         }
-}, :title => 'Sold                                                 in kjosk %c{      }'
-
-move_down 6
-%>
-
-<% form do |f| %>
-  <% f.heading 'Sold          in kjosk '+f.field('      ') %>
-  Apples   <%= f.field('    ') %>x<%= f.field('    ') %> boxes      <%= f.span %> =<%= f.field('         ') %>
-  Pears <%= f.field('       ') %>+ bananas<%= f.field('       ') %> <%= f.span %> =<%= f.field('         ') %>
-<% end -%>
-
-<% table do |f| %>
-  <% f.field :label => 'Repport (dd.mm.YYYY)', :value => Date.today %>
-<% end -%>
-
-<% table do |t| %>
-  <% t.row do |r| %>
-    <% r.label 'Permit'; r.span; r.text '    ' %>
-    <% r.field :label => 'Time', :value => '    ' %>
-  <% end -%>
-  <% t.row do |r| %>
-    <% r.label 'Cash';  r.span; r.text '    ' %>
-  <% end -%>
-  <% t.row do |r| %>
-    <% r.label 'Organizer';          r.span; r.text 'Crayfish' %>
-  <% end -%>
-  <% t.row_for @location do |r| %>
-    <% r.field :label => 'Location' , :value => @location[:name] %>
-    <% r.field :zip_code %>
-    <% r.field :city %>
-  <% end -%>
-<% end -%>
-
-<% form do |f| %>
-  <% f.row do |r| %>
-    <% r.label 'Permit'; r.span; r.text '    ' %>
-    <% r.field :label => 'Time', :value => '    ' %>
-  <% end -%>
-  <% f.row do |r| %>
-    <% r.label 'Cash';  r.span; r.text '    ' %>
-  <% end -%>
-  <% f.row do |r| %>
-    <% r.label 'Organizer';          r.span; r.text 'Crayfish' %>
-  <% end -%>
-  <% f.row_for @location do |r| %>
-    <% r.field :label => 'Location' , :value => @location[:name] %>
-    <% r.field :zip_code %>
-    <% r.field :city %>
-  <% end -%>
-<% end -%>
+<table>
+ <tr>
+  <th colspan = "6" align = "center" style="background-color:#aaffaa">Time Table</th>
+ </tr>
+ <tr>
+  <th rowspan = "6" style="background-color:#aaffaa">Hours</th>
+  <th style="background-color:#ffaaaa">Mon</th>
+  <th style="background-color:#ffaaaa">Tue</th>
+  <th style="background-color:#ffaaaa">Wed</th>
+  <th style="background-color:#ffaaaa">Thu</th>
+  <th style="background-color:#ffaaaa">Fri</th>
+ </tr>
+ <tr>
+  <td>Science</td>
+  <td>Maths</td>
+  <td>Science</td>
+  <td>Maths</td>
+  <td>Arts</td>
+ </tr>
+ <tr>
+  <td>Social</td>
+  <td>History</td>
+  <td>English</td>
+  <td>Social</td>
+  <td>Sports</td>
+ </tr>
+ <tr>
+  <th colspan = "5" align = "center">Lunch</th>
+ </tr>
+ <tr>
+  <td>Science</td>
+  <td>Maths</td>
+  <td>Science</td>
+  <td>Maths</td>
+  <td rowspan = "2">Project</td>
+ </tr>
+ <tr>
+  <td>Social</td>
+  <td>History</Td>
+  <td>English</td>
+  <td>Social</td>
+ </tr>
+</table>
 ```
 
-Which gives:
+Which gives you a single paged PDF looking like this:
 
 ![](http://github.com/patrickhno/crayfish/raw/master/doc/example.png) 
 
-You could also use Prawn directly if you want to:
+You can also use Prawn directly:
 
 ``` Ruby
 <% table [
