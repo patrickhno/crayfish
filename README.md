@@ -25,10 +25,10 @@ gem 'prawn', :git => 'git://github.com/teknobingo/prawn.git', :branch => 'master
 ``` html
 <table>
  <tr>
-  <th colspan = "6" align = "center" style="background-color:#aaffaa">Time Table</th>
+  <th colspan="6" align="center" style="background-color:#aaffaa">Time Table</th>
  </tr>
  <tr>
-  <th rowspan = "6" style="background-color:#aaffaa">Hours</th>
+  <th rowspan="6" style="background-color:#aaffaa">Hours</th>
   <th style="background-color:#ffaaaa">Mon</th>
   <th style="background-color:#ffaaaa">Tue</th>
   <th style="background-color:#ffaaaa">Wed</th>
@@ -50,14 +50,14 @@ gem 'prawn', :git => 'git://github.com/teknobingo/prawn.git', :branch => 'master
   <td>Sports</td>
  </tr>
  <tr>
-  <th colspan = "5" align = "center">Lunch</th>
+  <th colspan="5" align="center">Lunch</th>
  </tr>
  <tr>
   <td>Science</td>
   <td>Maths</td>
   <td>Science</td>
   <td>Maths</td>
-  <td rowspan = "2">Project</td>
+  <td rowspan="2">Project</td>
  </tr>
  <tr>
   <td>Social</td>
