@@ -22,7 +22,7 @@
 
 module Crayfish
   module Rails
-    class Base
+    class Base < ::ActionView::Base
 
       def self.call template
         "setup;" +

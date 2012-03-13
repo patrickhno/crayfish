@@ -37,12 +37,13 @@ module Prawn
 end
 
 module Crayfish
-  class CrayHtml < CrayContainer
+  class CrayHtml
 
     attr_reader :pdf
 
     def initialize fish,pdf
-      super
+      @fish    = fish
+      @pdf     = pdf
     end
 
     def apply_style cell,style
@@ -80,6 +81,13 @@ module Crayfish
       name = node.name.to_sym
 
       case name
+      when :img
+        # we would really like to use image_path here
+        image = {:image => "app#{node.attributes['src'].value}"}
+        image[:width]  = node.attributes['width'].value.to_f  if node.attributes['width']
+        image[:height] = node.attributes['height'].value.to_f if node.attributes['height']
+        return image
+
       when :table
         table = []
         table_styles = []
@@ -210,8 +218,14 @@ module Crayfish
       doc.children.map do |element|
         compile element
       end.flatten.each do |prawn|
-        post_resize prawn,540
-        prawn.draw
+        if prawn.kind_of? Hash
+          if prawn.has_key? :image
+            pdf.image prawn[:image], prawn
+          end
+        else
+          post_resize prawn,540
+          prawn.draw
+        end
       end
     end
 
