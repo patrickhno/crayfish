@@ -33,8 +33,7 @@ require 'crayfish/action_controller'
 require 'crayfish/action_view'
 require 'crayfish/rails/pdf'
 require 'crayfish/rails/base'
-require 'crayfish/elements/container.rb'
-require 'crayfish/elements/html.rb'
+require 'crayfish/html.rb'
 
 class ActionController::Base
   include Crayfish::ActionController
