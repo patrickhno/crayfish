@@ -32,6 +32,31 @@ module Prawn
       end
     end
 
+    def crayfish_debug_dump node
+      if node.kind_of? Prawn::Table
+        (0..node.row_length).map do |n|
+          crayfish_debug_dump node.row(n).map{ |c| crayfish_debug_dump c }
+        end
+      elsif node.kind_of? Prawn::Table::Cell::Text
+        node.content
+      elsif node.kind_of? Array
+        node.map{ |c| crayfish_debug_dump c }
+      elsif node.kind_of? String
+        node
+      elsif node.kind_of? Fixnum
+        node
+      elsif node.kind_of? Hash
+        node.map{ |k,v| [k,crayfish_debug_dump(v)] }
+      else
+        node.class.name
+      end
+    end
+
+    # inspect with human readable output
+    def inspect
+      "<Prawn::Table #{crayfish_debug_dump(self).inspect}>"
+    end
+
     attr_accessor :post_resize
   end
 end
@@ -100,12 +125,17 @@ module Crayfish
           attribs[:post_resize] = "#{percent}%"
         end
         attribs[:cell_style][:borders] = [] if node.attributes['border'] and node.attributes['border'].value=='0'
-        table = @pdf.make_table(table, attribs)
+
+        pdf_table = @pdf.make_table(table, attribs)
         table_styles.each do |style|
-          apply_style(table.row(style[:row]).column(style[:col]),style[:style]) 
+          apply_style(pdf_table.row(style[:row]).column(style[:col]),style[:style]) 
         end
-        scope[:td] << table if scope[:td]
-        return table
+        scope[:td] << pdf_table if scope[:td]
+        return pdf_table
+
+      when :tbody
+        traverse_children node, "#{path}#{postfix}", :table => scope[:table], :table_styles => scope[:table_styles], :tr => nil
+        return
 
       when :tr
         row = []
@@ -151,27 +181,6 @@ module Crayfish
 
       traverse_children node, "#{path}#{postfix}"
     end
-
-    # pp debug_dump(prawn_table)
-    # def debug_dump node
-    #   if node.kind_of? Prawn::Table
-    #     (0..node.row_length).map do |n|
-    #       debug_dump node.row(n).map{ |c| debug_dump c }
-    #     end
-    #   elsif node.kind_of? Prawn::Table::Cell::Text
-    #     node.content
-    #   elsif node.kind_of? Array
-    #     node.map{ |c| debug_dump c }
-    #   elsif node.kind_of? String
-    #     node
-    #   elsif node.kind_of? Fixnum
-    #     node
-    #   elsif node.kind_of? Hash
-    #     node.map{ |k,v| [k,debug_dump(v)] }
-    #   else
-    #     node.class.name
-    #   end
-    # end
 
     def post_resize node,parent_width
       if node.kind_of?(Prawn::Table::Cell::Subtable)
