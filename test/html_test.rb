@@ -21,52 +21,43 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 require 'test_helper'
-require 'action_controller'
-require 'action_view'
 
-class CrayfishTest < ActiveSupport::TestCase
-
-  class Response
-    def content_type
-      'pdf'
-    end
-
-    def content_type= val
-    end
-
-    def headers
-      @headers ||= {}
-    end
-  end
-
-  class ActionController
-    include Crayfish::ActionController
-
-    def response
-      @response ||= Response.new
-    end
-
-    def headers
-      response.headers
-    end
-  end
-
-  class ActionView
-    include Crayfish::ActionView
-
-    def controller
-      @controller ||= ActionController.new
-    end
-  end
+class HtmlTest < ActiveSupport::TestCase
 
   def setup
-    @view = ActionView.new
-    @view.send(:setup)
+    @html = ::Crayfish::Html.new(nil,nil)
   end
 
-  test "setup" do
-    @view = ActionView.new
-    @view.send(:setup)
+  test "compile img" do
+    img = stub('html img')
+    img.stubs(:name).returns(:img)
+    img.stubs(:attributes).returns({ 'src' => OpenStruct.new(:value => '/some url')})
+    assert_equal @html.compile(img), :image=>"app/some url"
+  end
+
+  test "compile empty td" do
+    td = stub('html td')
+    td.stubs(:name).returns(:td)
+    td.stubs(:children).returns([])
+    td.stubs(:attributes).returns({})
+    row = []
+    @html.compile(td,'/td','',:tr => row)
+    assert_equal row,[{:content => ''}]
+  end
+
+  test "compile td with text" do
+    text = stub('text')
+    text.stubs(:name).returns(:text)
+    text.stubs(:content).returns('test')
+    text.stubs(:children).returns([])
+
+    td = stub('html td')
+    td.stubs(:name).returns(:td)
+    td.stubs(:children).returns([ text ])
+    td.stubs(:attributes).returns({})
+    row = []
+    @html.compile(td,'/td','',:tr => row)
+    assert_equal row,[{:content => 'test'}]
   end
 
 end

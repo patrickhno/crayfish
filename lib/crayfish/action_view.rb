@@ -53,7 +53,7 @@ module Crayfish
       def paint template,raw=false
         begin
           html = raw ? template : eval(template)
-          CrayHtml.new(self,@pdf).draw(html)
+          Html.new(self,@pdf).draw(html)
         rescue => e
            no = 0
            ::Rails.logger.debug template.split("\n").map{ |line| no+=1; "#{no}: #{line}" }.join("\n")

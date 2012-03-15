@@ -62,7 +62,7 @@ module Prawn
 end
 
 module Crayfish
-  class CrayHtml
+  class Html
 
     attr_reader :pdf
 
