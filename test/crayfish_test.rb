@@ -49,6 +49,10 @@ class CrayfishTest < ActiveSupport::TestCase
     def headers
       response.headers
     end
+
+    def options
+      Crayfish::ActionController.options
+    end
   end
 
   class ActionView

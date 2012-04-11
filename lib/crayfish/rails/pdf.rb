@@ -29,9 +29,14 @@ module Crayfish
       attr_reader :options
 
       def initialize(controller)
-        @options = controller.send :options || {}
+        controller_options = controller.send(:options) || {}
+        @options = Crayfish::ActionController.options.merge(Hash[*controller_options.map{ |k,v| [k.to_sym,v] }.flatten])
 
-        controller.response.content_type ||= Mime::PDF
+        if options[:html]
+          controller.response.content_type ||= Mime::HTML
+        else
+          controller.response.content_type ||= Mime::PDF
+        end
 
         inline = options[:inline] ? 'inline' : 'attachment'
         filename = options[:filename] ? "filename=#{options[:filename]}" : nil

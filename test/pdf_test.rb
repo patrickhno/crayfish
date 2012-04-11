@@ -20,6 +20,25 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-module Crayfish
-  VERSION = "0.2.0"
+require 'test_helper'
+
+class PDFTest < ActiveSupport::TestCase
+
+  test 'merge options' do
+    response = mock('Response')
+    response.expects(:content_type).returns(nil)
+    response.expects(:content_type=).with(Mime::PDF)
+
+    headers = mock('Headers')
+    headers.expects(:[]=).with('Content-Disposition', 'inline')
+
+    controller = stub('Controller')
+    controller.stubs(:options).returns(:controller => :options)
+    controller.stubs(:response).returns(response)
+    controller.stubs(:headers).returns(headers)
+
+    pdf = Crayfish::Rails::PDF.new(controller)
+    assert_equal pdf.options, :inline=>true, :prawn=>{}, :controller=>:options
+  end
+
 end

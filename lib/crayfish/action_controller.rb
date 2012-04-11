@@ -26,6 +26,10 @@ module Crayfish
   private
 
     def options
+      self.options
+    end
+
+    def self.options
       { :inline => true, :prawn => {} }
     end
 

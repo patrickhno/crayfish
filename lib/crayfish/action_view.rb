@@ -53,6 +53,8 @@ module Crayfish
       def paint template,raw=false
         begin
           html = raw ? template : eval(template)
+          return html if @options[:html]
+
           Html.new(self,@pdf).draw(html)
         rescue => e
            no = 0
