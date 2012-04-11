@@ -93,6 +93,41 @@ You can also use Prawn directly:
 %>
 ```
 
+## Testing
+
+You can intercept the template compiler to perform view tests on the generated HTML with the :html option.
+
+``` Ruby
+class MyPdfController < ApplicationController
+  attr_reader :options
+
+  def show
+    @options = params[:options]
+    @pdf = MyPdfModel.find(params[:id])
+  end
+
+end
+```
+
+``` Ruby
+class MyPdfControllerTest < ActionController::TestCase
+
+  setup do
+    @pdf = Factory.create :my_pdf
+  end
+
+  test "should show PDF" do
+    get :show, id: @pdf.to_param, :format => :pdf, :options => {:html => true}
+    assert_response :success
+
+    assert_tag  :tag => 'div', 
+                :attributes => {
+                  :class => 'my_div'
+                }
+  end
+end
+```
+
 ## License
 
 (The MIT License)
