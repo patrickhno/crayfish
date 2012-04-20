@@ -26,10 +26,14 @@ module Crayfish
     def render *args
       if @branch_level
         @branch_level += 1
-        stack = @output_buffer
-        @output_buffer = ::ActionView::OutputBuffer.new
-        super
-        @output_buffer = stack
+        if @options[:html]
+          super
+        else
+          stack = @output_buffer
+          @output_buffer = ::ActionView::OutputBuffer.new
+          super
+          @output_buffer = stack
+        end
         @branch_level -= 1
       else
         super
@@ -68,7 +72,7 @@ module Crayfish
       def flush paint=true
         buf = @output_buffer.to_s || ''
         paint(buf,true) if paint
-        @output_buffer = ::ActionView::OutputBuffer.new
+        @output_buffer = ::ActionView::OutputBuffer.new unless @options[:html]
         buf
       end
 

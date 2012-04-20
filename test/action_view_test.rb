@@ -70,4 +70,20 @@ class CrayfishActionViewTest < ActiveSupport::TestCase
     assert_equal @view.send(:paint,'plain',true), 'plain'
   end
 
+  test "should not flush output bufer in HTML mode" do
+    @view.send(:output_buffer) << "A"
+    @view.send(:flush)
+    assert_equal @view.send(:output_buffer), 'A'
+  end
+
+  test "should flush output bufer in PDF mode" do
+    ActionController.any_instance.stubs(:options).returns({})
+    view = ActionView.new
+    view.send(:setup)
+
+    view.send(:output_buffer) << "A"
+    view.send(:flush)
+    assert_equal view.send(:output_buffer), ''
+  end
+
 end
