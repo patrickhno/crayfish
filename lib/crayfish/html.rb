@@ -188,16 +188,24 @@ module Crayfish
       elsif node.kind_of?(Prawn::Table)
         if node.post_resize
           if /^(?<size>.*)%$/ =~ node.post_resize
+            new_width = parent_width * size.to_f / 100.0
+            column_widths = node.column_widths.dup
+            scale = new_width / column_widths.sum
             node.instance_variable_set '@column_widths', nil
+
             # reset constraints
-            node.cells.each do |cell|
-              cell.instance_variable_set '@max_width', parent_width
+            (0..node.row_length).map do |n|
+              row = node.row(n).columns(0..-1)
+              row.each_with_index do |cell,i|
+                 cell.instance_variable_set '@max_width', column_widths[i]*scale
+              end
             end
-            node.width = parent_width
+            node.width = new_width
             node.send(:set_column_widths)
             node.send(:position_cells)
           end
         end
+
         column_widths = node.column_widths
         (0..node.row_length).map do |n|
 
