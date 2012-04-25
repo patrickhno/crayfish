@@ -76,12 +76,24 @@ module Crayfish
         buf
       end
 
-      def method_missing(meth, *args, &block)
-        if @pdf.respond_to?(meth)
+      def method_missing(id,*args,&block)
+        case(id.to_s)
+        when /^fill_and_stroke_(.*)/
           flush
-          @pdf.send(meth,*args)
+          @pdf.send($1,*args,&block); @pdf.fill_and_stroke
+        when /^stroke_(.*)/
+          flush
+          @pdf.send($1,*args,&block); @pdf.stroke
+        when /^fill_(.*)/
+          flush
+          @pdf.send($1,*args,&block); @pdf.fill
         else
-          super
+          if @pdf.respond_to?(id)
+            flush
+            @pdf.send(id,*args,&block)
+          else
+            super
+          end
         end
       end
 
