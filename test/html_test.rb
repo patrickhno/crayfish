@@ -43,6 +43,14 @@ class HtmlTest < ActiveSupport::TestCase
     assert_equal "/assets/a.file", @html.public_path_to_fs_path('a.file')
   end
 
+  test "should strip session key from public files" do # are these realy session keys?
+    ::Rails.stubs(:public_path).returns('/pub')
+    ::Rails.configuration.assets.stubs(:paths).returns(['/assets'])
+    File.expects(:exists?).with("/pub/a.file").returns(false)
+    File.expects(:exists?).with("/assets/a.file").returns(true)
+    assert_equal "/assets/a.file", @html.public_path_to_fs_path('a.file?123456')
+  end
+
   test "compile img" do
     img = stub('html img')
     img.stubs(:name).returns(:img)

@@ -76,6 +76,10 @@ module Crayfish
     end
 
     def public_path_to_fs_path path
+      if /^(?<stripped>[^\?]*)\?[0-9]*$/ =~ path
+        path = stripped
+      end
+
       search_paths = [::Rails.public_path] + ::Rails.configuration.assets.paths
       search_paths.each do |search_path|
         if File.exists?("#{search_path}/#{path}")
