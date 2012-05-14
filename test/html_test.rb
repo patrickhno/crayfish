@@ -28,11 +28,29 @@ class HtmlTest < ActiveSupport::TestCase
     @html = ::Crayfish::Html.new(nil,nil)
   end
 
+  test "should locate public files" do
+    ::Rails.stubs(:public_path).returns('/pub')
+    ::Rails.configuration.assets.stubs(:paths).returns([])
+    File.expects(:exists?).with("/pub/a.file").returns(true)
+    assert_equal "/pub/a.file", @html.public_path_to_fs_path('a.file')
+  end
+
+  test "should locate public files in a asset path" do
+    ::Rails.stubs(:public_path).returns('/pub')
+    ::Rails.configuration.assets.stubs(:paths).returns(['/assets'])
+    File.expects(:exists?).with("/pub/a.file").returns(false)
+    File.expects(:exists?).with("/assets/a.file").returns(true)
+    assert_equal "/assets/a.file", @html.public_path_to_fs_path('a.file')
+  end
+
   test "compile img" do
     img = stub('html img')
     img.stubs(:name).returns(:img)
-    img.stubs(:attributes).returns({ 'src' => OpenStruct.new(:value => '/some url')})
-    assert_equal @html.compile(img), :image=>"app/some url"
+    img.stubs(:attributes).returns({ 'src' => OpenStruct.new(:value => 'a.file')})
+    ::Rails.stubs(:public_path).returns('/pub')
+    ::Rails.configuration.assets.stubs(:paths).returns([])
+    File.expects(:exists?).with("/pub//images/a.file").returns(true)
+    assert_equal @html.compile(img), :image=>"/pub//images/a.file"
   end
 
   test "compile empty td" do

@@ -71,6 +71,33 @@ module Crayfish
       @pdf     = pdf
     end
 
+    def asset_paths
+      @@asset_paths ||= ::ActionView::Helpers::AssetTagHelper::AssetPaths.new(::Rails.configuration.action_controller)
+    end
+
+    def public_path_to_fs_path path
+      search_paths = [::Rails.public_path] + ::Rails.configuration.assets.paths
+      search_paths.each do |search_path|
+        if File.exists?("#{search_path}/#{path}")
+          return "#{search_path}/#{path}"
+        end
+      end
+
+      if /^\/assets\/(?<path>.*)$/ =~ path
+        search_paths.each do |search_path|
+          if File.exists?("#{search_path}/#{path}")
+            return "#{search_path}/#{path}"
+          end
+        end
+      end
+      raise "Could not locate #{path} in #{search_paths.inspect}"
+    end
+
+    def image_fs_path image
+      public_path = asset_paths.compute_public_path(image, 'images')
+      public_path_to_fs_path(public_path)
+    end
+
     def apply_style cell,style
       # background-color:#ccccff
       style.split(';').each do |style|
@@ -107,8 +134,7 @@ module Crayfish
 
       case name
       when :img
-        # we would really like to use image_path here
-        image = {:image => "app#{node.attributes['src'].value}"}
+        image = { :image =>  image_fs_path(node.attributes['src'].value) }
         image[:width]  = node.attributes['width'].value.to_f  if node.attributes['width']
         image[:height] = node.attributes['height'].value.to_f if node.attributes['height']
         return image
