@@ -24,7 +24,6 @@ module Crayfish
   module Rails
 
     class PDF
-      extend ActiveSupport::Memoizable
       
       attr_reader :options
 
