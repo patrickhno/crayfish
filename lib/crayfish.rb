@@ -44,6 +44,5 @@ class ActionView::Base
 end
 
 module ActionView
-  Mime::Type.register "application/pdf", :pdf
   ActionView::Template.register_template_handler 'crayfish', Crayfish::Rails::Base
 end
