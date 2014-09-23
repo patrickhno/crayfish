@@ -141,6 +141,14 @@ module Crayfish
         image = { :image =>  image_fs_path(node.attributes['src'].value) }
         image[:width]  = node.attributes['width'].value.to_f  if node.attributes['width']
         image[:height] = node.attributes['height'].value.to_f if node.attributes['height']
+        if node.attributes['align']
+          case node.attributes['align'].value.to_s.to_sym
+          when :right
+            image[:position] = :right
+          when :middle
+            image[:position] = :center
+          end
+        end
         return image
 
       when :table
@@ -151,10 +159,10 @@ module Crayfish
         # apply style
         full_width = 540
         attribs = { :cell_style => { :inline_format => true } }
-        if node.attributes['width'] and /^(?<percent>.*)%$/ =~ node.attributes['width'].value
+        if node.attributes['width'] && /^(?<percent>.*)%$/ =~ node.attributes['width'].value
           attribs[:post_resize] = "#{percent}%"
         end
-        attribs[:cell_style][:borders] = [] if node.attributes['border'] and node.attributes['border'].value=='0'
+        attribs[:cell_style][:borders] = [] if node.attributes['border'] && node.attributes['border'].value=='0'
 
         pdf_table = @pdf.make_table(table, attribs)
         table_styles.each do |style|
