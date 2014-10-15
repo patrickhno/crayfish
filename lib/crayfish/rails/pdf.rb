@@ -31,7 +31,7 @@ module Crayfish
         controller_options = controller ? controller.send(:options) || {} : {}
         @options = Crayfish::ActionController.options.merge(Hash[*controller_options.map{ |k,v| [k.to_sym,v] }.flatten])
 
-        if controller
+        if controller && controller.respond_to?(:response)
           if options[:html]
             controller.response.content_type ||= Mime::HTML
           else
@@ -41,7 +41,7 @@ module Crayfish
 
         inline = options[:inline] ? 'inline' : 'attachment'
         filename = options[:filename] ? "filename=#{options[:filename]}" : nil
-        controller.headers["Content-Disposition"] = [inline,filename].compact.join(';') if controller
+        controller.headers["Content-Disposition"] = [inline,filename].compact.join(';') if controller && controller.respond_to?(:headers)
       end
 
     end

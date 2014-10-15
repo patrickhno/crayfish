@@ -70,7 +70,7 @@ gem 'prawn', :git => 'git://github.com/teknobingo/prawn.git', :branch => 'master
 
 Which gives you a single paged PDF looking like this:
 
-![](http://github.com/patrickhno/crayfish/raw/master/doc/example.png) 
+![](https://raw.githubusercontent.com/patrickhno/crayfish/master/doc/example.png) 
 
 You can also use Prawn directly:
 
