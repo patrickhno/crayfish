@@ -28,7 +28,7 @@ module Crayfish
       attr_reader :options
 
       def initialize(controller)
-        controller_options = controller ? controller.send(:options) || {} : {}
+        controller_options = (controller && controller.respond_to?(:options)) ? controller.send(:options) || {} : {}
         @options = Crayfish::ActionController.options.merge(Hash[*controller_options.map{ |k,v| [k.to_sym,v] }.flatten])
 
         if controller && controller.respond_to?(:response)
